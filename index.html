@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 劉 絢 · 生日魔法祭 🌸</title>
+    <style>
+        :root {
+            --sakura-pink: #fcc2d0;
+            --sakura-light: #ffe4ec;
+            --magic-gold: #fde68a;
+            --tomo-blue: #7aaed8;
+            --syaoran-green: #6fa882;
+            --yue-silver: #c0c8e0;
+            --title-glow-duration: 3s;
+            --star-beat-duration: 1.5s;
+            --spin-slow-duration: 25s;
+            --orb-float-duration: 14s;
+            --character-appear-delay-base: 200ms;
+            --character-appear-interval: 450ms;
+            --blessing-ring-duration: 1.2s;
+            --video-ring-duration: 1s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 50% 40%, rgba(252, 228, 240, 0.6) 0%, rgba(240, 200, 220, 0.7) 45%, rgba(232, 184, 208, 0.85) 100%),
+                url('https://pic1.imgdb.cn/item/69ee1026f12344047bf5992a.jpg') center/cover no-repeat;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'KaiTi', sans-serif;
+            overflow-x: hidden;
+            cursor: default;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            position: relative;
+        }
+
+        .magic-circle-bg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 650px; height: 650px; border-radius: 50%;
+            border: 2px solid rgba(249, 213, 110, 0.35);
+            box-shadow: 0 0 80px rgba(255, 180, 200, 0.25);
+            pointer-events: none; z-index: 0;
+            animation: spinSlow var(--spin-slow-duration) linear infinite;
+        }
+        .magic-circle-bg::before { content: ''; position: absolute; inset: 30px; border-radius: 50%; border: 2px dashed rgba(249, 213, 110, 0.4); }
+        .magic-circle-bg::after { content: '★'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 32px; color: rgba(249, 213, 110, 0.8); text-shadow: 0 0 20px #ffe066; }
+        @keyframes spinSlow { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(75px); opacity: 0.5; animation: orbFloat var(--orb-float-duration) ease-in-out infinite; }
+        .bg-orb:nth-child(1) { width: 300px; height: 300px; background: rgba(255,182,193,0.5); top: -10%; left: -8%; }
+        .bg-orb:nth-child(2) { width: 270px; height: 270px; background: rgba(255,210,180,0.45); top: 60%; right: -10%; animation-duration: 16s; }
+        .bg-orb:nth-child(3) { width: 240px; height: 240px; background: rgba(245,180,200,0.5); bottom: -10%; left: 30%; animation-duration: 13s; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0,0) scale(1); }
+            25% { transform: translate(35px, -20px) scale(1.08); }
+            50% { transform: translate(-15px, 25px) scale(0.96); }
+            75% { transform: translate(-25px, -30px) scale(1.05); }
+        }
+
+        .falling-container { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+        .falling-item { position: absolute; top: -70px; animation: fallDown linear forwards; pointer-events: none; will-change: transform; }
+        .falling-item img { display: block; width: 100%; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        @keyframes fallDown {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.85; }
+            15% { opacity: 1; }
+            75% { opacity: 0.8; }
+            100% { transform: translateY(calc(100vh + 80px)) translateX(var(--drift)) rotate(var(--spin)); opacity: 0; }
+        }
+
+        .burst-container { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+        .burst-item { position: absolute; pointer-events: none; animation: burstOut 1s ease-out forwards; }
+        .burst-item img { display: block; width: 100%; height: auto; }
+        @keyframes burstOut {
+            0% { transform: translate(0,0) scale(0.2); opacity: 1; }
+            100% { transform: translate(var(--bx), var(--by)) scale(1.8); opacity: 0; }
+        }
+
+        .main-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; background: none; backdrop-filter: none; border-radius: 0; box-shadow: none; border: none; max-width: 550px; margin: 20px; }
+
+        .title-section { text-align: center; }
+        .main-title {
+            font-family: 'Dancing Script', 'Brush Script MT', 'KaiTi', cursive;
+            font-size: clamp(2.5rem, 6vw, 3.6rem); font-weight: 700; color: #c94a6e;
+            text-shadow: 2px 2px 8px rgba(200,70,100,0.2), 0 0 25px rgba(255,200,220,0.5);
+            animation: titleGlow var(--title-glow-duration) ease-in-out infinite;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .main-title .star-icon { display: inline-block; animation: starBeat var(--star-beat-duration) ease-in-out infinite; }
+        .main-title .star-icon img { height: 1em; display: block; filter: drop-shadow(0 0 6px rgba(255,200,100,0.6)); }
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 2px 2px 8px rgba(200,70,100,0.2), 0 0 25px rgba(255,200,220,0.4); }
+            50% { text-shadow: 2px 2px 14px rgba(200,70,100,0.35), 0 0 45px rgba(255,170,190,0.7), 0 0 70px rgba(249,213,110,0.4); }
+        }
+        @keyframes starBeat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            20% { transform: scale(1.3) rotate(15deg); }
+            40% { transform: scale(0.95) rotate(-5deg); }
+            60% { transform: scale(1.2) rotate(8deg); }
+        }
+        .sub-title { font-size: 1.1rem; color: #c27a8f; margin-top: 4px; letter-spacing: 0.1em; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .sub-title img { height: 1.3em; width: auto; display: block; }
+        .sakura-tag { display: inline-block; margin-top: 8px; font-size: 0.95rem; color: #b85c78; background: rgba(255,255,255,0.6); padding: 5px 20px; border-radius: 20px; backdrop-filter: blur(4px); border: 1px solid rgba(255,180,200,0.6); letter-spacing: 0.05em; }
+
+        .cake-container { position: relative; width: 440px; height: 500px; margin-top: 5px; filter: drop-shadow(0 16px 28px rgba(180,90,110,0.28)); }
+        .cake-plate {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 380px; height: 55px;
+            background: radial-gradient(ellipse at 50% 35%, #fffefb 0%, #f5e8dc 45%, #e2cfba 100%);
+            border-radius: 50%; box-shadow: 0 10px 0 #d4bba4, 0 12px 0 #c4a88e, 0 16px 30px rgba(150,90,100,0.3), inset 0 -6px 10px rgba(0,0,0,0.06);
+            z-index: 1;
+        }
+        .cake-plate::after { content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 330px; height: 20px; background: radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, transparent 70%); border-radius: 50%; }
+        .cake-layer { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 20px 20px 10px 10px; z-index: 2; }
+        .cake-body {
+            position: relative; width: 100%; height: 100%; border-radius: inherit;
+            background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,225,235,0.9) 10%, #ffb8c6 35%, #f89db3 60%, #ee8fa5 100%);
+            box-shadow: inset 0 3px 15px rgba(255,255,255,0.5), inset 0 -15px 25px rgba(180,70,100,0.2);
+        }
+        .cake-body::before { content: ''; position: absolute; bottom: -14px; left: 0; width: 100%; height: 16px; background: linear-gradient(180deg, #d47a90 0%, #c0687e 40%, #b0556c 100%); border-radius: 0 0 10px 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: -1; }
+        .cake-body::after { content: ''; position: absolute; top: 6px; left: 15%; width: 70%; height: 10px; background: rgba(255,255,255,0.45); border-radius: 50%; filter: blur(4px); }
+        .layer-1 { bottom: 44px; width: 320px; height: 95px; border-radius: 22px 22px 12px 12px; }
+        .layer-1 .cake-body { border-radius: 22px 22px 12px 12px; }
+        .layer-1 .cake-body::before { bottom: -16px; height: 18px; border-radius: 0 0 12px 12px; }
+        .layer-2 { bottom: 130px; width: 255px; height: 82px; border-radius: 20px 20px 10px 10px; z-index: 5; }
+        .layer-2 .cake-body { border-radius: 20px 20px 10px 10px; background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,225,235,0.9) 10%, #ffc0ce 35%, #faa3b8 60%, #f094a8 100%); }
+        .layer-2 .cake-body::before { bottom: -14px; height: 16px; border-radius: 0 0 10px 10px; background: linear-gradient(180deg, #d88598 0%, #c57082 40%, #b25e6e 100%); }
+        .layer-3 { bottom: 202px; width: 188px; height: 68px; border-radius: 18px 18px 8px 8px; z-index: 7; }
+        .layer-3 .cake-body { border-radius: 18px 18px 8px 8px; background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, #ffdbe5 30%, #ffcad6 70%, #fcb0c2 100%); }
+        .layer-3 .cake-body::before { bottom: -12px; height: 14px; border-radius: 0 0 8px 8px; background: linear-gradient(180deg, #dc8ea0 0%, #ca7a8c 40%, #b86878 100%); }
+        .cream-top {
+            position: absolute; top: -22px; left: -14px; width: calc(100% + 28px); height: 36px;
+            background: linear-gradient(180deg, #ffffff 0%, #fffdf8 30%, #fef5ee 60%, #fce4ec 100%);
+            border-radius: 44px 44px 14px 14px; box-shadow: 0 6px 0 #f0bcc8, 0 8px 16px rgba(200,100,130,0.15), inset 0 2px 4px rgba(255,255,255,0.8);
+            z-index: 4;
+        }
+        .cream-top::before {
+            content: ''; position: absolute; bottom: -12px; left: 2px; right: 2px; height: 16px;
+            background: radial-gradient(circle at 14px 0, #fffefb 10px, transparent 10px),
+                        radial-gradient(circle at 42px 0, #fffdf8 11px, transparent 11px),
+                        radial-gradient(circle at 70px 0, #fffefb 9px, transparent 9px),
+                        radial-gradient(circle at 98px 0, #fffdf8 11px, transparent 11px),
+                        radial-gradient(circle at 126px 0, #fffefb 10px, transparent 10px),
+                        radial-gradient(circle at 154px 0, #fffdf8 9px, transparent 9px),
+                        radial-gradient(circle at 182px 0, #fffefb 11px, transparent 11px),
+                        radial-gradient(circle at 210px 0, #fffdf8 10px, transparent 10px),
+                        radial-gradient(circle at 238px 0, #fffefb 9px, transparent 9px);
+            filter: drop-shadow(0 3px 4px rgba(180,100,120,0.2));
+        }
+        .cream-top::after { content: ''; position: absolute; top: 6px; left: 24px; right: 24px; height: 8px; background: rgba(255,255,255,0.75); border-radius: 50%; filter: blur(3px); }
+        .sprinkle { position: absolute; width: 5px; height: 12px; border-radius: 3px; z-index: 8; opacity: 0.85; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+        .letter-candles-group { position: absolute; bottom: 276px; left: 50%; transform: translateX(-50%); display: flex; gap: 22px; z-index: 13; }
+        .letter-item { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
+        .letter-item:hover { transform: scale(1.06); }
+        .letter-char {
+            font-family: 'Georgia', 'Times New Roman', serif; font-size: 52px; font-weight: bold; line-height: 1;
+            position: relative; z-index: 2; margin-bottom: 8px; transition: color 0.15s ease, text-shadow 0.15s ease;
+        }
+        .letter-char.low-freq { color: #ff6b8a; text-shadow: 0 0 20px #ff4081, 0 0 40px #ff80ab, 0 2px 8px rgba(0,0,0,0.2); }
+        .letter-char.mid-freq { color: #ffb347; text-shadow: 0 0 20px #ff9f00, 0 0 40px #ffc107, 0 2px 8px rgba(0,0,0,0.2); }
+        .letter-char.high-freq { color: #7ec8e0; text-shadow: 0 0 20px #4dd0e1, 0 0 40px #80deea, 0 2px 8px rgba(0,0,0,0.2); }
+        .flame-new {
+            position: absolute; top: -38px; left: 50%; transform: translateX(-50%); width: 22px; height: 32px;
+            background: radial-gradient(ellipse at 50% 75%, #fffde7 0%, #fff9c4 20%, #ffeb3b 40%, #ffa000 65%, #ff5f00 100%);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            box-shadow: 0 0 25px 12px rgba(255,140,0,0.6), 0 0 50px 18px rgba(255,100,0,0.35), 0 0 8px 4px rgba(255,255,200,0.5);
+            z-index: 14; animation: flameDance 0.5s ease-in-out infinite alternate, flameGlow 1.8s ease-in-out infinite;
+            transition: opacity 0.35s, transform 0.35s; transform-origin: center bottom;
+        }
+        .flame-new.extinguished { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.1); }
+        @keyframes flameDance {
+            0% { transform: translateX(-50%) scaleY(1) rotate(-1.5deg) skewX(-2deg); }
+            100% { transform: translateX(-50%) scaleY(1.08) rotate(2deg) skewX(2deg); }
+        }
+        @keyframes flameGlow {
+            0%, 100% { box-shadow: 0 0 25px 12px rgba(255,140,0,0.6), 0 0 50px 18px rgba(255,100,0,0.35); }
+            50% { box-shadow: 0 0 35px 16px rgba(255,160,0,0.75), 0 0 70px 25px rgba(255,120,0,0.5); }
+        }
+        .smoke-new { position: absolute; top: -48px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: rgba(200,180,160,0.7); border-radius: 50%; opacity: 0; pointer-events: none; z-index: 11; }
+        .smoke-new.visible { animation: smokeRiseNew 1.6s ease-out forwards; }
+        @keyframes smokeRiseNew {
+            0% { opacity: 0.85; transform: translateX(-50%) translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-60px) scale(3.8); }
+        }
+
+        .character {
+            position: absolute; z-index: 16; display: flex; flex-direction: column; align-items: center;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); pointer-events: none; opacity: 0;
+            transition: opacity 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .character.visible { opacity: 1; }
+        .character .char-icon img { display: block; height: 65px; width: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .kero-chan .char-icon img { height: 75px; }
+        .tomo-chan .char-icon img { height: 126px; }
+        .meiling-chan .char-icon img { height: 100px; }
+        .syaoran-kun .char-icon img { height: 84px; }
+        .yue .char-icon img { height: 120px; }
+        .sakura-wand-char { top: 20px; left: -180px; z-index: 18; }
+        .sakura-wand-char.visible { animation: wandFloatLarge 4s ease-in-out infinite; }
+        .sakura-wand-char .char-icon img { height: 180px; transform: scaleX(-1); filter: drop-shadow(0 10px 16px rgba(180,100,120,0.35)); }
+        .sakura-bottom-char { bottom: -95px; left: 50%; transform: translateX(-50%); z-index: 18; }
+        .sakura-bottom-char .char-icon img { height: 115px; filter: drop-shadow(0 6px 10px rgba(180,100,120,0.25)); }
+        .spinel { top: 210px; left: -100px; z-index: 17; }
+        .spinel.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -1.8s; }
+        .spinel .char-icon img { height: 90px; transform: scaleX(-1); filter: drop-shadow(0 6px 10px rgba(180,100,120,0.3)); }
+        .character .char-label { display: none; }
+        .kero-chan { bottom: 10px; right: -45px; }
+        .kero-chan.visible { animation: keroBounce 2.5s ease-in-out infinite; }
+        .tomo-chan { bottom: 10px; left: -120px; }
+        .tomo-chan.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -1s; }
+        .meiling-chan { bottom: 5px; left: -40px; }
+        .meiling-chan.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -1.5s; }
+        .syaoran-kun { bottom: 120px; right: -80px; }
+        .syaoran-kun.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -2s; }
+        .yue { top: 8px; right: -75px; }
+        .yue.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -0.5s; }
+
+        .top-right-sakura-char {
+            top: -245px;
+            right: -170px;
+            z-index: 19;
+            filter: drop-shadow(0 6px 10px rgba(180,100,120,0.4));
+        }
+        .top-right-sakura-char .char-icon img {
+            height: 170px;
+            width: auto;
+            transform: rotate(-10deg);
+            filter: drop-shadow(0 6px 10px rgba(180,100,120,0.3));
+        }
+        .top-right-sakura-char.visible {
+            animation: topRightFloat 4s ease-in-out infinite;
+        }
+        @keyframes topRightFloat {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-12px) rotate(-12deg); }
+        }
+
+        @keyframes wandFloatLarge { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(3deg); } }
+        @keyframes keroBounce { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-14px); } 50% { transform: translateY(0); } 70% { transform: translateY(-6px); } }
+        @keyframes charFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+        .video-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200;
+            display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .video-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .video-modal {
+            position: relative; width: 70vmin; height: 70vmin; max-width: 600px; max-height: 600px; background: #1a1a2e;
+            border-radius: 50%; overflow: visible; box-shadow: 0 0 0 3px rgba(249,213,110,0.5), 0 0 60px rgba(249,180,80,0.35), 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.85); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .video-modal-overlay.active .video-modal { transform: scale(1); }
+        .video-modal::before, .video-modal::after { content: ''; position: absolute; border-radius: 50%; border: 3px solid rgba(249,213,110,0.6); opacity: 0; pointer-events: none; z-index: -1; }
+        .video-modal::before { inset: -10px; }
+        .video-modal::after { inset: -10px; }
+        .video-modal-overlay.active .video-modal::before { animation: magicRingExpandCircle var(--video-ring-duration) ease-out forwards; }
+        .video-modal-overlay.active .video-modal::after { animation: magicRingExpandCircle var(--video-ring-duration) ease-out 0.15s forwards; }
+        @keyframes magicRingExpandCircle { 0% { opacity: 0.8; inset: -5px; border-width: 4px; } 100% { opacity: 0; inset: -55px; border-width: 1px; } }
+        .video-modal video { display: block; width: 100%; height: 100%; object-fit: cover; background: #000; border-radius: 50%; position: relative; z-index: 1; }
+        .video-close-btn {
+            position: absolute; top: 4px; right: 4px; width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,100,140,0.85); backdrop-filter: blur(6px); border: 2px solid rgba(255,255,255,0.7);
+            color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s; z-index: 5; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .video-close-btn:hover { background: rgba(255,80,120,0.95); border-color: #fff; transform: scale(1.15); box-shadow: 0 6px 18px rgba(255,80,120,0.5); }
+
+        .blessing-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 220;
+            display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .blessing-modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .blessing-modal {
+            position: relative; width: 75vw; max-width: 480px; min-height: 85vh;
+            background: url('https://pic1.imgdb.cn/item/69efbaca5b9ddfae24424b6f.png') center/cover no-repeat;
+            border-radius: 24px; overflow: visible;
+            box-shadow: 0 0 0 4px rgba(249,213,110,0.6), 0 0 60px rgba(249,180,80,0.45), 0 0 120px rgba(255,180,120,0.35), 0 20px 50px rgba(180,90,110,0.35);
+            transform: scale(0.7); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+        }
+        .blessing-modal-overlay.active .blessing-modal {
+            transform: scale(1);
+            box-shadow: 0 0 0 6px rgba(255,200,150,0.7), 0 0 80px rgba(249,180,80,0.55), 0 0 150px rgba(255,160,100,0.4), 0 20px 50px rgba(180,90,110,0.35);
+        }
+        .blessing-modal::before, .blessing-modal::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; z-index: -1; opacity: 0; }
+        .blessing-modal::before { inset: -25px; border-radius: 35px; border: 3px solid rgba(249,213,110,0.7); box-shadow: 0 0 30px rgba(249,200,100,0.5); }
+        .blessing-modal::after { inset: -40px; border-radius: 42px; border: 2px solid rgba(255,182,193,0.5); box-shadow: 0 0 50px rgba(255,150,180,0.4); }
+        .blessing-modal-overlay.active .blessing-modal::before { animation: blessingGlowRing1 var(--blessing-ring-duration) ease-out forwards; }
+        .blessing-modal-overlay.active .blessing-modal::after { animation: blessingGlowRing2 var(--blessing-ring-duration) ease-out 0.2s forwards; }
+        @keyframes blessingGlowRing1 { 0% { opacity: 0; inset: -10px; border-width: 5px; } 30% { opacity: 0.9; } 100% { opacity: 0; inset: -80px; border-width: 1px; } }
+        @keyframes blessingGlowRing2 { 0% { opacity: 0; inset: -15px; border-width: 4px; } 35% { opacity: 0.8; } 100% { opacity: 0; inset: -100px; border-width: 0.5px; } }
+        .blessing-magic-particle { position: fixed; pointer-events: none; z-index: 230; animation: blessingParticleBurst 1.2s ease-out forwards; }
+        @keyframes blessingParticleBurst { 0% { transform: translate(0, 0) scale(0); opacity: 1; } 30% { opacity: 1; } 100% { transform: translate(var(--bpx), var(--bpy)) scale(1.5); opacity: 0; } }
+
+        .blessing-falling-container { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; border-radius: 24px; }
+        .blessing-header {
+            background: rgba(255,255,255,0.6); backdrop-filter: blur(4px); border-radius: 22px 22px 0 0;
+            padding: 16px 24px; text-align: center; position: relative; overflow: hidden; z-index: 1; width: 100%;
+            border-bottom: 1px solid rgba(255,180,200,0.6);
+        }
+        .blessing-header::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, transparent 60%); animation: headerShine 3s ease-in-out infinite; }
+        @keyframes headerShine { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(10px, -5px); } }
+        .blessing-title {
+            font-family: 'Dancing Script', 'KaiTi', cursive; font-size: 1.6rem; color: #b85c78;
+            text-shadow: 1px 1px 4px rgba(180,80,100,0.2); position: relative; z-index: 1; letter-spacing: 0.05em;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .blessing-title img { height: 1.2em; width: auto; display: block; }
+        .blessing-title .spin-left { animation: spinLeft 4s linear infinite; }
+        .blessing-title .spin-right { animation: spinRight 4s linear infinite; }
+        @keyframes spinLeft { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes spinRight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .blessing-body {
+            padding: 24px 28px 10px; text-align: center; position: relative; z-index: 1;
+            background: rgba(255,255,255,0.35); backdrop-filter: blur(2px); margin: 10px 20px;
+            border-radius: 16px; border: 1px solid rgba(255,180,200,0.6); margin-top: auto; width: calc(100% - 40px);
+        }
+        .blessing-message {
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'KaiTi', sans-serif; font-size: 0.95rem; color: #c94a6e;
+            line-height: 1.9; letter-spacing: 0.04em; padding: 20px 14px 30px 14px; background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(1px); border-radius: 16px; border: 1px solid rgba(255,180,200,0.3); position: relative;
+        }
+        .blessing-decor-left { position: absolute; bottom: 6px; left: 8px; z-index: 2; }
+        .blessing-decor-left img { height: 82px; width: auto; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+        .blessing-decor-right { position: absolute; bottom: 6px; right: 8px; z-index: 2; }
+        .blessing-decor-right img { height: 82px; width: auto; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+        .blessing-from {
+            text-align: right; margin-top: 6px; margin-bottom: 2px; font-family: 'Dancing Script', 'KaiTi', cursive;
+            font-size: 1.1rem; color: #c27a8f; letter-spacing: 0.05em; position: relative; z-index: 1; width: 100%; padding: 0 28px;
+        }
+        .blessing-from-sub {
+            text-align: right; margin-top: 0; margin-bottom: 10px; font-family: 'Dancing Script', 'KaiTi', cursive;
+            font-size: 0.9rem; color: #c27a8f; letter-spacing: 0.04em; position: relative; z-index: 1; width: 100%; padding: 0 28px;
+        }
+        .blessing-close-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px auto 20px;
+            padding: 8px 32px; border-radius: 20px; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,180,200,0.6); color: #b85c78; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; box-shadow: 0 4px 12px rgba(200,100,140,0.2); letter-spacing: 0.05em;
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'KaiTi', sans-serif; position: relative; z-index: 1;
+        }
+        .blessing-close-btn img { height: 1.1em; width: auto; display: block; }
+        .blessing-close-btn:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(200,100,140,0.35); background: rgba(255,255,255,0.8); }
+        .blessing-close-btn:active { transform: scale(0.95); }
+
+        .reopen-blessing-btn {
+            position: fixed; right: 12px; top: 55%; transform: translateY(-50%); z-index: 100;
+            width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 182, 193, 0.8);
+            backdrop-filter: blur(8px); border: 2px solid rgba(249, 213, 110, 0.5);
+            box-shadow: 0 4px 14px rgba(200, 100, 140, 0.3); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: musicBtnFloat 3s ease-in-out infinite;
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
+        .reopen-blessing-btn:hover { transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 20px rgba(200, 100, 140, 0.4); }
+        .reopen-blessing-btn:active { transform: translateY(-50%) scale(0.92); }
+
+        .magic-particles-container { position: fixed; inset: 0; pointer-events: none; z-index: 250; }
+        .magic-particle { position: absolute; border-radius: 50%; pointer-events: none; animation: magicParticleBurst 0.8s ease-out forwards; }
+        .magic-particle-implode { position: absolute; border-radius: 50%; pointer-events: none; animation: magicParticleImplode 0.6s ease-in forwards; }
+        @keyframes magicParticleBurst { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; } }
+        @keyframes magicParticleImplode { 0% { transform: translate(var(--px), var(--py)) scale(0); opacity: 1; } 100% { transform: translate(0,0) scale(1); opacity: 0; } }
+
+        .music-control {
+            position: fixed; bottom: 24px; right: 24px; z-index: 100; width: 55px; height: 55px; border-radius: 50%;
+            background: transparent; backdrop-filter: none; border: none;
+            box-shadow: 0 4px 16px rgba(200,100,140,0.25), 0 0 0 4px rgba(255,220,240,0.3);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            -webkit-tap-highlight-color: transparent; animation: musicBtnFloat 3s ease-in-out infinite; overflow: hidden; padding: 0;
+        }
+        .music-control:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(200,100,140,0.35), 0 0 0 8px rgba(255,200,220,0.4); }
+        .music-control:active { transform: scale(0.92); transition: transform 0.15s ease; }
+        .music-control .music-icon { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
+        .music-control .music-icon img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+        .music-control.playing .music-icon img { animation: iconSpin 3s linear infinite; }
+        .music-control.paused .music-icon img { animation: none; }
+        .music-control.playing { box-shadow: 0 4px 20px rgba(255,160,60,0.5), 0 0 0 6px rgba(255,200,150,0.4); animation: musicBtnFloat 3s ease-in-out infinite, musicGlowPulse 1.8s ease-in-out infinite; }
+        .music-control.paused { box-shadow: 0 4px 14px rgba(180,140,160,0.25), 0 0 0 4px rgba(220,200,220,0.3); animation: musicBtnFloat 3s ease-in-out infinite; }
+        @keyframes iconSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes musicBtnFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes musicGlowPulse { 0%, 100% { box-shadow: 0 4px 20px rgba(255,160,60,0.5), 0 0 0 6px rgba(255,200,150,0.4); } 50% { box-shadow: 0 4px 28px rgba(255,160,60,0.7), 0 0 0 12px rgba(255,200,150,0.2); } }
+
+        @media (max-width: 400px) {
+            .top-right-sakura-char { top: -180px; right: -110px; }
+            .top-right-sakura-char .char-icon img { height: 120px; }
+            .cake-container { transform: scale(0.7); height: 380px; }
+            .main-title { font-size: 1.9rem; }
+            .character .char-icon img { height: 45px; }
+            .kero-chan .char-icon img { height: 55px; }
+            .tomo-chan .char-icon img { height: 90px; }
+            .meiling-chan .char-icon img { height: 70px; }
+            .syaoran-kun .char-icon img { height: 58px; }
+            .yue .char-icon img { height: 90px; }
+            .sakura-wand-char .char-icon img { height: 125px; }
+            .sakura-bottom-char .char-icon img { height: 80px; }
+            .spinel .char-icon img { height: 65px; }
+            .spinel { top: 190px; left: -70px; }
+            .kero-chan { right: -25px; bottom: 5px; }
+            .tomo-chan { left: -80px; bottom: 5px; }
+            .meiling-chan { left: -20px; bottom: 3px; }
+            .syaoran-kun { right: -50px; bottom: 80px; }
+            .yue { right: -45px; top: 5px; }
+            .sakura-wand-char { top: 10px; left: -125px; }
+            .sakura-bottom-char { bottom: -70px; }
+            .music-control { bottom: 16px; right: 16px; width: 46px; height: 46px; }
+            .reopen-blessing-btn { right: 6px; width: 40px; height: 40px; font-size: 15px; }
+            .letter-char { font-size: 38px; }
+            .letter-candles-group { gap: 14px; bottom: 255px; }
+            .video-modal { width: 82vmin; height: 82vmin; }
+            .video-close-btn { top: 0px; right: 0px; width: 30px; height: 30px; font-size: 16px; }
+            .blessing-modal { width: 88vw; min-height: 80vh; }
+            .blessing-decor-left img, .blessing-decor-right img { height: 65px; }
+            .blessing-message { font-size: 0.85rem; padding: 16px 10px 26px 10px; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <audio id="bgm" src="https://cdn.jsdelivr.net/gh/Will-Leung/music/%E5%9D%82%E6%9C%AC%E7%9C%9F%E7%B6%BE%20-%20CLEAR.mp3" loop preload="auto" crossorigin="anonymous"></audio>
+    <div class="magic-circle-bg"></div>
+    <div class="bg-orbs"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+    <div class="falling-container" id="fallingContainer"></div>
+    <div class="burst-container" id="burstContainer"></div>
+    <div class="magic-particles-container" id="magicParticlesContainer"></div>
+
+    <div class="video-modal-overlay" id="videoModalOverlay">
+        <div class="video-modal">
+            <button class="video-close-btn" id="videoCloseBtn" title="关闭视频">✕</button>
+            <video id="popupVideo" src="https://cdn.jsdelivr.net/gh/Will-Leung/music/202604272255_compressed.mp4" playsinline preload="auto"></video>
+        </div>
+    </div>
+
+    <div class="blessing-modal-overlay" id="blessingModalOverlay">
+        <div class="blessing-modal" id="blessingModal">
+            <div class="blessing-falling-container" id="blessingFallingContainer"></div>
+            <div class="blessing-header">
+                <div class="blessing-title">
+                    <img class="spin-left" src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e0.webp" alt="装饰">
+                    魔法の祝福
+                    <img class="spin-right" src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e1.webp" alt="装饰">
+                </div>
+            </div>
+            <div class="blessing-body">
+                <div class="blessing-message">
+                    <div class="blessing-decor-left"><img src="https://pic1.imgdb.cn/item/69ee1032f12344047bf59934.webp" alt="和服小樱"></div>
+                    <div class="blessing-decor-right"><img src="https://pic1.imgdb.cn/item/69ee1036f12344047bf59937.webp" alt="和服知世"></div>
+                    在这特别的日子里，<br>
+                    愿所有魔法都为你而来，<br>
+                    愿每一颗星都为你闪耀，<br>
+                    愿幸福与笑容永远伴随你，<br>
+                    愿你未来能一直美美哒，<br>
+                    有穿不完的美美衣服，<br>
+                    有吃不完的肉肉，<br>
+                    我不是小狼，但也是只汪，<br>
+                    愿我能有机会像小狼那样爱你。<br>
+                    生日快乐，喵酱！✨
+                </div>
+            </div>
+            <p class="blessing-from">—— 小樱与伙伴们</p>
+            <p class="blessing-from-sub">还有一只小汪 🐶</p>
+            <button class="blessing-close-btn" id="blessingCloseBtn">
+                <img src="https://pic1.imgdb.cn/item/69ee21faf12344047bf5d36d.png" alt="装饰"> 收下祝福
+            </button>
+        </div>
+    </div>
+
+    <div class="reopen-blessing-btn" id="reopenBlessingBtn" title="祝福">💌</div>
+
+    <div class="music-control paused" id="musicControl" title="点击播放音乐">
+        <span class="music-icon"><img src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e0.webp" alt="music" id="musicIconImg"></span>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="title-section">
+            <div class="main-title">
+                <span class="star-icon"><img src="https://pic1.imgdb.cn/item/69ee21faf12344047bf5d36b.png" alt="左装饰"></span>
+                Happy Birthday
+                <span class="star-icon"><img src="https://pic1.imgdb.cn/item/69ee21edf12344047bf5d369.png" alt="右装饰"></span>
+            </div>
+            <div class="sub-title">
+                <img src="https://pic1.imgdb.cn/item/69ee21cef12344047bf5d363.png" alt="装饰">
+                劉 絢 · 魔法の祝福
+                <img src="https://pic1.imgdb.cn/item/69ee21cef12344047bf5d363.png" alt="装饰">
+            </div>
+            <div class="sakura-tag">✨ みんなでお祝い！ ✨</div>
+        </div>
+        <div class="cake-container" id="cakeContainer">
+            <div class="cake-plate"></div>
+            <div class="cake-layer layer-1"><div class="cake-body"></div><div class="cream-top"></div><div class="sprinkle" style="left:12%;top:22%;background:#ffe770;"></div><div class="sprinkle" style="left:35%;top:42%;background:#ff8ca3;"></div><div class="sprinkle" style="left:58%;top:18%;background:#7ec8e0;"></div><div class="sprinkle" style="left:75%;top:55%;background:#ffe770;"></div><div class="sprinkle" style="left:88%;top:25%;background:#ffb3c6;"></div></div>
+            <div class="cake-layer layer-2"><div class="cake-body"></div><div class="cream-top"></div><div class="sprinkle" style="left:15%;top:30%;background:#ff8ca3;"></div><div class="sprinkle" style="left:45%;top:15%;background:#ffe770;"></div><div class="sprinkle" style="left:72%;top:50%;background:#7ec8e0;"></div><div class="sprinkle" style="left:85%;top:10%;background:#ffb3c6;"></div></div>
+            <div class="cake-layer layer-3"><div class="cake-body"></div><div class="cream-top"></div><div class="sprinkle" style="left:20%;top:35%;background:#ffe770;"></div><div class="sprinkle" style="left:55%;top:12%;background:#ff8ca3;"></div><div class="sprinkle" style="left:78%;top:40%;background:#7ec8e0;"></div></div>
+            <div class="letter-candles-group" id="letterCandlesGroup">
+                <div class="letter-item" data-letter="0"><div class="flame-new" id="flameL0"></div><div class="smoke-new" id="smokeL0"></div><div class="letter-char low-freq" id="letterChar0">A</div></div>
+                <div class="letter-item" data-letter="1"><div class="flame-new" id="flameL1"></div><div class="smoke-new" id="smokeL1"></div><div class="letter-char mid-freq" id="letterChar1">Y</div></div>
+                <div class="letter-item" data-letter="2"><div class="flame-new" id="flameL2"></div><div class="smoke-new" id="smokeL2"></div><div class="letter-char high-freq" id="letterChar2">A</div></div>
+            </div>
+            <div class="character top-right-sakura-char">
+                <span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee1034f12344047bf59936.webp" alt="右上小樱"></span>
+            </div>
+            <div class="character spinel"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee1020f12344047bf59926.webp" alt="斯比奈鲁"></span></div>
+            <div class="character sakura-wand-char"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee0e9cf12344047bf598c6.webp" alt="绿衣小樱"></span></div>
+            <div class="character sakura-bottom-char"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee1028f12344047bf5992c.webp" alt="小樱和小狼"></span></div>
+            <div class="character kero-chan"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee1209f12344047bf59af7.webp" alt="小可"></span></div>
+            <div class="character tomo-chan"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee7e7df12344047bf722bc.png" alt="知世"></span></div>
+            <div class="character meiling-chan"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee7d96f12344047bf71e2b.png" alt="李梅玲"></span></div>
+            <div class="character syaoran-kun"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee119ef12344047bf59a8a.webp" alt="小狼"></span></div>
+            <div class="character yue"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee11a4f12344047bf59a92.webp" alt="月"></span></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const CONFIG = {
+                MUSIC_IMG_PLAY: 'https://pic1.imgdb.cn/item/69ee1bb2f12344047bf5d2e2.webp',
+                MUSIC_IMG_PAUSE: 'https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e0.webp',
+                CHARACTER_DELAY_BASE: 200,
+                CHARACTER_DELAY_INTERVAL: 450,
+                CANDLE_COUNT: 3,
+                VIDEO_TRIGGER_DELAY: 500,
+                FALLING_INITIAL_COUNT: 15,
+                FALLING_MAX_COUNT: 20,
+                FALLING_SPAWN_INTERVAL: 400,
+                FALLING_SIZE_MIN: 18,
+                FALLING_SIZE_MAX: 46,
+                FALLING_DURATION_MIN: 8,
+                FALLING_DURATION_MAX: 20,
+                BLESSING_FALLING_INIT_COUNT: 6,
+                BLESSING_FALLING_MAX_COUNT: 8,
+                BLESSING_FALLING_SPAWN_INTERVAL: 500,
+                BLESSING_FALLING_SIZE_MIN: 15,
+                BLESSING_FALLING_SIZE_MAX: 35,
+                BLESSING_FALLING_DURATION_MIN: 6,
+                BLESSING_FALLING_DURATION_MAX: 14,
+                PARTICLE_COLORS: ['#fde68a','#ffb3c6','#ffd966','#fff0c0','#ffc8d8','#ffe9a7','#ff8ca3','#fff'],
+                BLESSING_PARTICLE_COLORS: ['#fde68a','#ffd966','#fff0c0','#ffe9a7','#ffb3c6','#ffc8d8','#ff8ca3','#fff','#f9d56e','#ffe066'],
+                BLESSING_PARTICLE_COUNT: 55,
+                BLESSING_PARTICLE_DIST_MIN: 60,
+                BLESSING_PARTICLE_DIST_MAX: 260,
+                BLESSING_PARTICLE_SIZE_MIN: 3,
+                BLESSING_PARTICLE_SIZE_MAX: 11,
+                BLESSING_PARTICLE_DURATION_MIN: 0.8,
+                BLESSING_PARTICLE_DURATION_MAX: 1.6,
+                BURST_PARTICLE_COUNT_MIN: 14,
+                BURST_PARTICLE_COUNT_MAX: 24,
+                BURST_PARTICLE_SIZE_MIN: 16,
+                BURST_PARTICLE_SIZE_MAX: 40,
+                BURST_PARTICLE_DIST_MIN: 45,
+                BURST_PARTICLE_DIST_MAX: 135,
+                BURST_PARTICLE_DURATION_MIN: 0.7,
+                BURST_PARTICLE_DURATION_MAX: 1.5,
+                VIDEO_OPEN_PARTICLE_COUNT: 45,
+                VIDEO_OPEN_PARTICLE_DIST_MIN: 80,
+                VIDEO_OPEN_PARTICLE_DIST_MAX: 260,
+                VIDEO_OPEN_PARTICLE_SIZE_MIN: 4,
+                VIDEO_OPEN_PARTICLE_SIZE_MAX: 14,
+                VIDEO_OPEN_PARTICLE_DURATION_MIN: 0.6,
+                VIDEO_OPEN_PARTICLE_DURATION_MAX: 1.2,
+                VIDEO_CLOSE_PARTICLE_COUNT: 40,
+                VIDEO_CLOSE_PARTICLE_DIST_MIN: 90,
+                VIDEO_CLOSE_PARTICLE_DIST_MAX: 290,
+                VIDEO_CLOSE_PARTICLE_SIZE_MIN: 4,
+                VIDEO_CLOSE_PARTICLE_SIZE_MAX: 13,
+                VIDEO_CLOSE_PARTICLE_DURATION_MIN: 0.4,
+                VIDEO_CLOSE_PARTICLE_DURATION_MAX: 0.8,
+                BLESSING_SCALE_TARGET: 0.2,
+                BLESSING_ANIM_DURATION: 0.5,
+                BLESSING_ANIM_EASING: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                OVERLAY_FADE_DURATION: 0.5,
+                SMOKE_ANIM_DURATION: 1600,
+            };
+
+            const randomRange = (min, max) => min + Math.random() * (max - min);
+
+            const AppState = {
+                music: { started: false, playing: false },
+                blessing: { shown: false, closing: false },
+                candles: { extinguished: 0, videoTriggered: false }
+            };
+
+            class AudioManager {
+                constructor(bgmElement, onFrequencyUpdate) {
+                    this.bgm = bgmElement;
+                    this.onFrequencyUpdate = onFrequencyUpdate;
+                    this.audioContext = null;
+                    this.analyser = null;
+                    this.sourceNode = null;
+                    this.animationId = null;
+                }
+                async init() {
+                    if (this.audioContext) return;
+                    try {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        this.analyser = this.audioContext.createAnalyser();
+                        this.analyser.fftSize = 256;
+                        this.analyser.smoothingTimeConstant = 0.8;
+                        this.sourceNode = this.audioContext.createMediaElementSource(this.bgm);
+                        this.sourceNode.connect(this.analyser);
+                        this.analyser.connect(this.audioContext.destination);
+                    } catch (e) { console.warn('音频分析初始化失败:', e); }
+                }
+                async play() {
+                    if (!this.audioContext) await this.init();
+                    if (this.audioContext && this.audioContext.state === 'suspended') await this.audioContext.resume();
+                    try { await this.bgm.play(); this.startVisualizer(); return true; } catch { return false; }
+                }
+                pause() { this.bgm.pause(); this.stopVisualizer(); }
+                startVisualizer() {
+                    if (!this.analyser || this.animationId) return;
+                    const bufferLength = this.analyser.frequencyBinCount;
+                    const dataArray = new Uint8Array(bufferLength);
+                    const update = () => {
+                        if (!this.analyser) return;
+                        this.analyser.getByteFrequencyData(dataArray);
+                        if (this.onFrequencyUpdate) {
+                            const lowAvg = dataArray.slice(0, 12).reduce((a, b) => a + b, 0) / 12;
+                            const midAvg = dataArray.slice(12, 50).reduce((a, b) => a + b, 0) / 38;
+                            const highAvg = dataArray.slice(50, 128).reduce((a, b) => a + b, 0) / 78;
+                            this.onFrequencyUpdate({
+                                low: Math.min(lowAvg / 200, 1),
+                                mid: Math.min(midAvg / 180, 1),
+                                high: Math.min(highAvg / 160, 1)
+                            });
+                        }
+                        this.animationId = requestAnimationFrame(update);
+                    };
+                    update();
+                }
+                stopVisualizer() {
+                    if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
+                }
+            }
+
+            const ParticleFactory = {
+                _container: document.getElementById('magicParticlesContainer'),
+                create({ type, cx, cy, count, distMin, distMax, sizeMin, sizeMax, durMin, durMax, colors, extraStyle = '' }) {
+                    for (let i = 0; i < count; i++) {
+                        const p = document.createElement('div');
+                        p.className = type;
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = randomRange(distMin, distMax);
+                        const size = randomRange(sizeMin, sizeMax);
+                        const dur = randomRange(durMin, durMax);
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        p.style.cssText = `left:${cx}px; top:${cy}px; width:${size}px; height:${size}px; background:${color}; box-shadow:0 0 ${size*2}px ${size}px rgba(249,213,110,0.6); --px:${Math.cos(angle)*dist}px; --py:${Math.sin(angle)*dist}px; animation-duration:${dur}s; ${extraStyle}`;
+                        this._container.appendChild(p);
+                        setTimeout(() => p.remove(), dur * 1000 + 400);
+                    }
+                },
+                burst(cx, cy) { this.create({ type: 'magic-particle', cx, cy, count: CONFIG.VIDEO_OPEN_PARTICLE_COUNT, distMin: CONFIG.VIDEO_OPEN_PARTICLE_DIST_MIN, distMax: CONFIG.VIDEO_OPEN_PARTICLE_DIST_MAX, sizeMin: CONFIG.VIDEO_OPEN_PARTICLE_SIZE_MIN, sizeMax: CONFIG.VIDEO_OPEN_PARTICLE_SIZE_MAX, durMin: CONFIG.VIDEO_OPEN_PARTICLE_DURATION_MIN, durMax: CONFIG.VIDEO_OPEN_PARTICLE_DURATION_MAX, colors: CONFIG.PARTICLE_COLORS }); },
+                implode(cx, cy) { this.create({ type: 'magic-particle-implode', cx, cy, count: CONFIG.VIDEO_CLOSE_PARTICLE_COUNT, distMin: CONFIG.VIDEO_CLOSE_PARTICLE_DIST_MIN, distMax: CONFIG.VIDEO_CLOSE_PARTICLE_DIST_MAX, sizeMin: CONFIG.VIDEO_CLOSE_PARTICLE_SIZE_MIN, sizeMax: CONFIG.VIDEO_CLOSE_PARTICLE_SIZE_MAX, durMin: CONFIG.VIDEO_CLOSE_PARTICLE_DURATION_MIN, durMax: CONFIG.VIDEO_CLOSE_PARTICLE_DURATION_MAX, colors: CONFIG.PARTICLE_COLORS }); },
+                blessingMagic(cx, cy) {
+                    for (let i = 0; i < CONFIG.BLESSING_PARTICLE_COUNT; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'blessing-magic-particle';
+                        const angle = Math.random() * Math.PI * 2;
+                        const dist = randomRange(CONFIG.BLESSING_PARTICLE_DIST_MIN, CONFIG.BLESSING_PARTICLE_DIST_MAX);
+                        const size = randomRange(CONFIG.BLESSING_PARTICLE_SIZE_MIN, CONFIG.BLESSING_PARTICLE_SIZE_MAX);
+                        const color = CONFIG.BLESSING_PARTICLE_COLORS[Math.floor(Math.random() * CONFIG.BLESSING_PARTICLE_COLORS.length)];
+                        particle.style.cssText = `left:${cx}px; top:${cy}px; width:${size}px; height:${size}px; border-radius:50%; background:${color}; box-shadow:0 0 ${size*3}px ${size}px rgba(249,213,110,0.7); --bpx:${Math.cos(angle)*dist}px; --bpy:${Math.sin(angle)*dist - 40}px; animation-duration:${randomRange(CONFIG.BLESSING_PARTICLE_DURATION_MIN, CONFIG.BLESSING_PARTICLE_DURATION_MAX)}s; z-index:230;`;
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 1800);
+                    }
+                }
+            };
+
+            class FallingManager {
+                constructor(container, options) {
+                    this.container = container;
+                    this.options = options;
+                    this.images = options.images;
+                    this.intervalId = null;
+                }
+                start() {
+                    if (this.intervalId) return;
+                    this.container.innerHTML = '';
+                    for (let i = 0; i < this.options.initialCount; i++) this._spawn();
+                    this.intervalId = setInterval(() => { if (this.container.children.length < this.options.maxCount) this._spawn(); }, this.options.spawnInterval);
+                }
+                stop() { if (this.intervalId) { clearInterval(this.intervalId); this.intervalId = null; } this.container.innerHTML = ''; }
+                _spawn() {
+                    const item = document.createElement('div'); item.className = 'falling-item';
+                    const img = document.createElement('img');
+                    img.src = this.images[Math.floor(Math.random() * this.images.length)];
+                    const size = randomRange(this.options.sizeMin, this.options.sizeMax);
+                    img.style.width = size + 'px'; item.appendChild(img);
+                    item.style.left = Math.random() * 96 + '%';
+                    item.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+                    item.style.setProperty('--spin', (Math.random() * 720 - 360) + 'deg');
+                    const dur = randomRange(this.options.durMin, this.options.durMax);
+                    item.style.animationDuration = dur + 's'; this.container.appendChild(item);
+                    setTimeout(() => item.remove(), dur * 1000 + 300);
+                }
+            }
+
+            class Modal {
+                constructor(overlay, options = {}) {
+                    this.overlay = overlay;
+                    this.onOpen = options.onOpen || (() => {});
+                    this.onClose = options.onClose || (() => {});
+                    this._escHandler = (e) => { if (e.key === 'Escape' && this.overlay.classList.contains('active')) this.close(); };
+                    document.addEventListener('keydown', this._escHandler);
+                    this.overlay.addEventListener('click', (e) => { if (e.target === this.overlay) this.close(); });
+                }
+                open() { if (AppState.blessing.closing) return; this.overlay.classList.add('active'); this.onOpen(this); }
+                close() { this.overlay.classList.remove('active'); this.onClose(this); }
+            }
+
+            class VideoModal extends Modal {
+                constructor(overlay, videoEl, closeBtn, onEnd) {
+                    super(overlay, {
+                        onOpen: () => {
+                            ParticleFactory.burst(window.innerWidth/2, window.innerHeight/2);
+                            videoEl.currentTime = 0;
+                            videoEl.play().catch(() => { videoEl.muted = true; videoEl.play().catch(() => {}); });
+                            if (AppState.music.playing) {
+                                audioManager.pause();
+                                AppState.music.playing = false;
+                                updateMusicUI();
+                            }
+                        },
+                        onClose: () => {
+                            videoEl.pause();
+                            ParticleFactory.implode(window.innerWidth/2, window.innerHeight/2);
+                            if (onEnd) onEnd();
+                        }
+                    });
+                    this.video = videoEl;
+                    this.video.addEventListener('ended', () => this.close());
+                    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.close(); });
+                }
+            }
+
+            class BlessingModal extends Modal {
+                constructor(overlay, modalEl, reopenBtn, fallingManager) {
+                    super(overlay, {
+                        onOpen: () => {
+                            fallingManager.start();
+                            ParticleFactory.blessingMagic(window.innerWidth/2, window.innerHeight/2);
+                            if (!AppState.music.playing) {
+                                audioManager.play().then(success => {
+                                    if (success) {
+                                        AppState.music.playing = true;
+                                        updateMusicUI();
+                                    }
+                                });
+                            }
+                        },
+                        onClose: () => {}
+                    });
+                    this.modal = modalEl;
+                    this.reopenBtn = reopenBtn;
+                    this._fallingManager = fallingManager;
+                    this._closeBtn = document.getElementById('blessingCloseBtn');
+                    this._closeBtn.addEventListener('click', (e) => { e.stopPropagation(); this.close(); });
+                    this._isAnimating = false;
+                }
+
+                openFromButton(btn) {
+                    if (this._isAnimating || AppState.blessing.closing) return;
+                    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+                    const btnRect = btn.getBoundingClientRect();
+                    const startX = btnRect.left + btnRect.width/2 - cx;
+                    const startY = btnRect.top + btnRect.height/2 - cy;
+                    this.modal.style.transition = 'none';
+                    this.modal.style.transform = `translate(${startX}px, ${startY}px) scale(${CONFIG.BLESSING_SCALE_TARGET})`;
+                    void this.modal.offsetWidth;
+                    this.modal.style.transition = `transform ${CONFIG.BLESSING_ANIM_DURATION}s ${CONFIG.BLESSING_ANIM_EASING}`;
+                    this.modal.style.transform = '';
+                    super.open();
+                }
+
+                close() { if (this.overlay.classList.contains('active')) this.closeWithAnimation(); }
+
+                closeWithAnimation() {
+                    if (this._isAnimating || AppState.blessing.closing) return;
+                    AppState.blessing.closing = true;
+                    this._isAnimating = true;
+                    this._fallingManager.stop();
+                    const modal = this.modal, overlay = this.overlay, btn = this.reopenBtn;
+                    modal.style.transition = 'none';
+                    modal.style.transform = 'translate(0px, 0px) scale(1)';
+                    void modal.offsetWidth;
+                    const btnRect = btn.getBoundingClientRect();
+                    const modalRect = modal.getBoundingClientRect();
+                    const dx = (btnRect.left + btnRect.width/2) - (modalRect.left + modalRect.width/2);
+                    const dy = (btnRect.top + btnRect.height/2) - (modalRect.top + modalRect.height/2);
+                    modal.style.transition = `transform ${CONFIG.BLESSING_ANIM_DURATION}s ${CONFIG.BLESSING_ANIM_EASING}`;
+                    modal.style.transform = `translate(${dx}px, ${dy}px) scale(${CONFIG.BLESSING_SCALE_TARGET})`;
+                    overlay.style.transition = `opacity ${CONFIG.OVERLAY_FADE_DURATION}s ease`;
+                    overlay.style.opacity = '0';
+                    const onEnd = () => { modal.removeEventListener('transitionend', onEnd); this.finishClose(); };
+                    modal.addEventListener('transitionend', onEnd);
+                    this._fallbackTimer = setTimeout(onEnd, 800);
+                }
+
+                finishClose() {
+                    if (this._fallbackTimer) clearTimeout(this._fallbackTimer);
+                    this.overlay.classList.remove('active');
+                    this.overlay.style.opacity = '';
+                    this.overlay.style.transition = '';
+                    this.modal.style.transition = '';
+                    this.modal.style.transform = '';
+                    if (!AppState.blessing.shown) {
+                        AppState.blessing.shown = true;
+                        this.reopenBtn.style.visibility = 'visible';
+                        this.reopenBtn.style.opacity = '1';
+                        this.reopenBtn.style.pointerEvents = 'auto';
+                    }
+                    AppState.blessing.closing = false;
+                    this._isAnimating = false;
+                }
+            }
+
+            class CelebrationSequence {
+                constructor(videoModal, blessingModal) { this.videoModal = videoModal; this.blessingModal = blessingModal; this._started = false; }
+                start() { if (!this._started) { this._started = true; this.videoModal.open(); } }
+            }
+
+            const bgmEl = document.getElementById('bgm');
+            const musicControl = document.getElementById('musicControl');
+            const musicIconImg = document.getElementById('musicIconImg');
+            const letterChars = [
+                document.getElementById('letterChar0'),
+                document.getElementById('letterChar1'),
+                document.getElementById('letterChar2')
+            ];
+            const flameNews = document.querySelectorAll('.flame-new');
+            const smokeNews = document.querySelectorAll('.smoke-new');
+
+            const audioManager = new AudioManager(bgmEl, ({ low, mid, high }) => {
+                if (letterChars[0]) {
+                    letterChars[0].style.color = `rgb(${255 - low*80}, ${107 - low*60}, ${138 - low*40})`;
+                    letterChars[0].style.textShadow = `0 0 ${14+low*26}px rgba(${255-low*80},${107-low*60},${138-low*40},0.8), 0 0 ${28+low*32}px rgba(${255-low*80},${107-low*60},${138-low*40},0.5)`;
+                }
+                if (letterChars[1]) {
+                    letterChars[1].style.color = `rgb(255, ${179-mid*50}, ${71-mid*50})`;
+                    letterChars[1].style.textShadow = `0 0 ${14+mid*26}px rgba(255,${179-mid*50},${71-mid*50},0.8), 0 0 ${28+mid*32}px rgba(255,${179-mid*50},${71-mid*50},0.5)`;
+                }
+                if (letterChars[2]) {
+                    letterChars[2].style.color = `rgb(${126-high*80}, ${200-high*40}, ${224-high*20})`;
+                    letterChars[2].style.textShadow = `0 0 ${14+high*26}px rgba(${126-high*80},${200-high*40},${224-high*20},0.8), 0 0 ${28+high*32}px rgba(${126-high*80},${200-high*40},${224-high*20},0.5)`;
+                }
+            });
+
+            const fallingImages = [
+                'https://pic1.imgdb.cn/item/69ee21edf12344047bf5d368.png',
+                'https://pic1.imgdb.cn/item/69ee21cef12344047bf5d366.png',
+                'https://pic1.imgdb.cn/item/69ee21cef12344047bf5d364.png',
+                'https://pic1.imgdb.cn/item/69ee21cef12344047bf5d361.png',
+                'https://pic1.imgdb.cn/item/69ee103ef12344047bf5993e.webp',
+                'https://pic1.imgdb.cn/item/69ee21cef12344047bf5d363.png'
+            ];
+
+            const mainFalling = new FallingManager(document.getElementById('fallingContainer'), {
+                images: fallingImages, initialCount: CONFIG.FALLING_INITIAL_COUNT, maxCount: CONFIG.FALLING_MAX_COUNT,
+                spawnInterval: CONFIG.FALLING_SPAWN_INTERVAL, sizeMin: CONFIG.FALLING_SIZE_MIN, sizeMax: CONFIG.FALLING_SIZE_MAX,
+                durMin: CONFIG.FALLING_DURATION_MIN, durMax: CONFIG.FALLING_DURATION_MAX
+            });
+            mainFalling.start();
+
+            const blessingFalling = new FallingManager(document.getElementById('blessingFallingContainer'), {
+                images: fallingImages, initialCount: CONFIG.BLESSING_FALLING_INIT_COUNT, maxCount: CONFIG.BLESSING_FALLING_MAX_COUNT,
+                spawnInterval: CONFIG.BLESSING_FALLING_SPAWN_INTERVAL, sizeMin: CONFIG.BLESSING_FALLING_SIZE_MIN, sizeMax: CONFIG.BLESSING_FALLING_SIZE_MAX,
+                durMin: CONFIG.BLESSING_FALLING_DURATION_MIN, durMax: CONFIG.BLESSING_FALLING_DURATION_MAX
+            });
+
+            const reopenBtn = document.getElementById('reopenBlessingBtn');
+            const blessingModal = new BlessingModal(
+                document.getElementById('blessingModalOverlay'),
+                document.getElementById('blessingModal'),
+                reopenBtn,
+                blessingFalling
+            );
+
+            const videoModal = new VideoModal(
+                document.getElementById('videoModalOverlay'),
+                document.getElementById('popupVideo'),
+                document.getElementById('videoCloseBtn'),
+                () => blessingModal.open()
+            );
+
+            const sequence = new CelebrationSequence(videoModal, blessingModal);
+
+            function updateMusicUI() {
+                if (AppState.music.playing) {
+                    musicControl.classList.remove('paused'); musicControl.classList.add('playing');
+                    musicIconImg.src = CONFIG.MUSIC_IMG_PLAY; musicControl.title = '点击暂停音乐';
+                } else {
+                    musicControl.classList.remove('playing'); musicControl.classList.add('paused');
+                    musicIconImg.src = CONFIG.MUSIC_IMG_PAUSE; musicControl.title = '点击播放音乐';
+                }
+            }
+
+            musicControl.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (AppState.music.playing) {
+                    audioManager.pause();
+                    AppState.music.playing = false;
+                } else {
+                    const success = await audioManager.play();
+                    AppState.music.playing = success;
+                    if (success && !AppState.music.started) AppState.music.started = true;
+                }
+                updateMusicUI();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.music-control') || e.target.closest('.video-modal-overlay') || e.target.closest('.blessing-modal-overlay') || e.target.closest('.reopen-blessing-btn')) return;
+                if (!AppState.music.started) musicControl.click();
+            });
+            document.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.music-control') || e.target.closest('.video-modal-overlay') || e.target.closest('.blessing-modal-overlay') || e.target.closest('.reopen-blessing-btn')) return;
+                if (!AppState.music.started) musicControl.click();
+            });
+
+            const letterItems = Array.from(document.querySelectorAll('.letter-item'));
+            document.getElementById('letterCandlesGroup').addEventListener('click', (e) => {
+                const item = e.target.closest('.letter-item'); if (!item) return;
+                e.stopPropagation();
+                const idx = letterItems.indexOf(item);
+                const flame = flameNews[idx], smoke = smokeNews[idx];
+                if (!flame.classList.contains('extinguished')) {
+                    flame.classList.add('extinguished'); AppState.candles.extinguished++;
+                    smoke.classList.remove('visible'); void smoke.offsetWidth; smoke.classList.add('visible');
+                    setTimeout(() => smoke.classList.remove('visible'), CONFIG.SMOKE_ANIM_DURATION);
+                    if (AppState.candles.extinguished === CONFIG.CANDLE_COUNT && !AppState.candles.videoTriggered) {
+                        AppState.candles.videoTriggered = true; setTimeout(() => sequence.start(), CONFIG.VIDEO_TRIGGER_DELAY);
+                    }
+                } else {
+                    flame.classList.remove('extinguished'); AppState.candles.extinguished = Math.max(0, AppState.candles.extinguished - 1);
+                    smoke.classList.remove('visible'); if (AppState.candles.extinguished < CONFIG.CANDLE_COUNT) AppState.candles.videoTriggered = false;
+                }
+            });
+
+            const burstContainer = document.getElementById('burstContainer');
+            const burstImages = [
+                'https://pic1.imgdb.cn/item/69ee21faf12344047bf5d36d.png',
+                'https://pic1.imgdb.cn/item/69ee21faf12344047bf5d36c.png',
+                'https://pic1.imgdb.cn/item/69ee21cef12344047bf5d365.png'
+            ];
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.letter-item') || e.target.closest('.music-control') || e.target.closest('.video-modal-overlay') || e.target.closest('.blessing-modal-overlay') || e.target.closest('.reopen-blessing-btn')) return;
+                const x = e.clientX, y = e.clientY;
+                const count = Math.floor(randomRange(CONFIG.BURST_PARTICLE_COUNT_MIN, CONFIG.BURST_PARTICLE_COUNT_MAX));
+                for (let i = 0; i < count; i++) {
+                    const b = document.createElement('div'); b.className = 'burst-item';
+                    const img = document.createElement('img'); img.src = burstImages[Math.floor(Math.random() * burstImages.length)];
+                    const size = randomRange(CONFIG.BURST_PARTICLE_SIZE_MIN, CONFIG.BURST_PARTICLE_SIZE_MAX); img.style.width = size + 'px';
+                    b.appendChild(img); b.style.left = x + 'px'; b.style.top = y + 'px';
+                    const angle = Math.random() * Math.PI * 2; const dist = randomRange(CONFIG.BURST_PARTICLE_DIST_MIN, CONFIG.BURST_PARTICLE_DIST_MAX);
+                    b.style.setProperty('--bx', Math.cos(angle) * dist + 'px'); b.style.setProperty('--by', Math.sin(angle) * dist - 25 + 'px');
+                    b.style.animationDuration = randomRange(CONFIG.BURST_PARTICLE_DURATION_MIN, CONFIG.BURST_PARTICLE_DURATION_MAX) + 's';
+                    burstContainer.appendChild(b); setTimeout(() => b.remove(), 2000);
+                }
+            });
+
+            reopenBtn.addEventListener('click', (e) => { e.stopPropagation(); blessingModal.openFromButton(reopenBtn); });
+
+            const cakeContainer = document.getElementById('cakeContainer');
+            const characters = Array.from(cakeContainer.querySelectorAll('.character'));
+            for (let i = characters.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [characters[i], characters[j]] = [characters[j], characters[i]]; }
+            characters.forEach((char, index) => { setTimeout(() => { char.classList.add('visible'); }, index * CONFIG.CHARACTER_DELAY_INTERVAL + CONFIG.CHARACTER_DELAY_BASE); });
+
+            updateMusicUI();
+            console.log('🎵 祝福窗口打开时音乐将自动继续播放！');
+        })();
+    </script>
+</body>
+</html>
