@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌟 劉 絢 · 生日魔法祭 🌸</title>
     <style>
         :root {
@@ -38,6 +38,7 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             position: relative;
+            padding: 20px 0;
         }
 
         .magic-circle-bg {
@@ -82,10 +83,11 @@
             100% { transform: translate(var(--bx), var(--by)) scale(1.8); opacity: 0; }
         }
 
-        .main-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; background: none; backdrop-filter: none; border-radius: 0; box-shadow: none; border: none; max-width: 550px; margin: 20px; }
+        .main-wrapper { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px; background: none; backdrop-filter: none; border-radius: 0; box-shadow: none; border: none; max-width: 550px; margin: 0 auto; }
 
         .title-section { text-align: center; }
         .main-title {
+            position: relative;
             font-family: 'Dancing Script', 'Brush Script MT', 'KaiTi', cursive;
             font-size: clamp(2.5rem, 6vw, 3.6rem); font-weight: 700; color: #c94a6e;
             text-shadow: 2px 2px 8px rgba(200,70,100,0.2), 0 0 25px rgba(255,200,220,0.5);
@@ -222,20 +224,15 @@
         .yue.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -0.5s; }
 
         .top-right-sakura-char {
-            top: -245px;
-            right: -170px;
-            z-index: 19;
+            top: -245px; right: -170px; z-index: 19;
             filter: drop-shadow(0 6px 10px rgba(180,100,120,0.4));
         }
         .top-right-sakura-char .char-icon img {
-            height: 170px;
-            width: auto;
+            height: 170px; width: auto;
             transform: rotate(-10deg);
             filter: drop-shadow(0 6px 10px rgba(180,100,120,0.3));
         }
-        .top-right-sakura-char.visible {
-            animation: topRightFloat 4s ease-in-out infinite;
-        }
+        .top-right-sakura-char.visible { animation: topRightFloat 4s ease-in-out infinite; }
         @keyframes topRightFloat {
             0%, 100% { transform: translateY(0) rotate(-10deg); }
             50% { transform: translateY(-12px) rotate(-12deg); }
@@ -388,37 +385,43 @@
         @keyframes musicBtnFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
         @keyframes musicGlowPulse { 0%, 100% { box-shadow: 0 4px 20px rgba(255,160,60,0.5), 0 0 0 6px rgba(255,200,150,0.4); } 50% { box-shadow: 0 4px 28px rgba(255,160,60,0.7), 0 0 0 12px rgba(255,200,150,0.2); } }
 
-        @media (max-width: 400px) {
-            .top-right-sakura-char { top: -180px; right: -110px; }
-            .top-right-sakura-char .char-icon img { height: 120px; }
-            .cake-container { transform: scale(0.7); height: 380px; }
-            .main-title { font-size: 1.9rem; }
-            .character .char-icon img { height: 45px; }
-            .kero-chan .char-icon img { height: 55px; }
-            .tomo-chan .char-icon img { height: 90px; }
-            .meiling-chan .char-icon img { height: 70px; }
-            .syaoran-kun .char-icon img { height: 58px; }
-            .yue .char-icon img { height: 90px; }
-            .sakura-wand-char .char-icon img { height: 125px; }
-            .sakura-bottom-char .char-icon img { height: 80px; }
-            .spinel .char-icon img { height: 65px; }
-            .spinel { top: 190px; left: -70px; }
-            .kero-chan { right: -25px; bottom: 5px; }
+        /* ========== 手机端优化 ========== */
+        @media (max-width: 480px) {
+            body { padding: 10px 0; }
+            .top-right-sakura-char { top: -120px; right: -80px; }
+            .top-right-sakura-char .char-icon img { height: 100px; }
+            .cake-container { transform: scale(0.65); margin-top: -30px; }
+            .main-title { font-size: 2rem; }
+            .blessing-modal { width: 95vw; max-width: 95vw; min-height: 0; height: auto; max-height: 85vh; border-radius: 16px; transform: scale(0.85); }
+            .blessing-modal-overlay.active .blessing-modal { transform: scale(1); }
+            .blessing-body { padding: 16px 12px; margin: 8px 10px; width: calc(100% - 20px); }
+            .blessing-message { font-size: 0.85rem; padding: 14px 10px 20px 10px; }
+            .blessing-decor-left img, .blessing-decor-right img { height: 60px; }
+            .blessing-close-btn { padding: 8px 24px; font-size: 0.9rem; }
+            .music-control { bottom: 80px; right: 16px; width: 46px; height: 46px; }
+            .reopen-blessing-btn { right: 16px; top: auto; bottom: 20px; width: 46px; height: 46px; font-size: 16px; transform: none; }
+            .reopen-blessing-btn:hover { transform: scale(1.1); }
+            .character .char-icon img { height: 40px; }
+            .kero-chan .char-icon img { height: 50px; }
+            .tomo-chan .char-icon img { height: 80px; }
+            .meiling-chan .char-icon img { height: 65px; }
+            .syaoran-kun .char-icon img { height: 55px; }
+            .yue .char-icon img { height: 80px; }
+            .sakura-wand-char .char-icon img { height: 110px; }
+            .sakura-bottom-char .char-icon img { height: 70px; }
+            .spinel .char-icon img { height: 55px; }
             .tomo-chan { left: -80px; bottom: 5px; }
-            .meiling-chan { left: -20px; bottom: 3px; }
-            .syaoran-kun { right: -50px; bottom: 80px; }
-            .yue { right: -45px; top: 5px; }
-            .sakura-wand-char { top: 10px; left: -125px; }
-            .sakura-bottom-char { bottom: -70px; }
-            .music-control { bottom: 16px; right: 16px; width: 46px; height: 46px; }
-            .reopen-blessing-btn { right: 6px; width: 40px; height: 40px; font-size: 15px; }
-            .letter-char { font-size: 38px; }
-            .letter-candles-group { gap: 14px; bottom: 255px; }
+            .meiling-chan { left: -25px; bottom: 3px; }
+            .syaoran-kun { right: -60px; bottom: 80px; }
+            .yue { right: -50px; top: 5px; }
+            .sakura-wand-char { top: 10px; left: -100px; }
+            .sakura-bottom-char { bottom: -60px; }
+            .spinel { top: 160px; left: -60px; }
+            .kero-chan { right: -30px; bottom: 5px; }
             .video-modal { width: 82vmin; height: 82vmin; }
-            .video-close-btn { top: 0px; right: 0px; width: 30px; height: 30px; font-size: 16px; }
-            .blessing-modal { width: 88vw; min-height: 80vh; }
-            .blessing-decor-left img, .blessing-decor-right img { height: 65px; }
-            .blessing-message { font-size: 0.85rem; padding: 16px 10px 26px 10px; }
+            .video-close-btn { top: 0; right: 0; width: 30px; height: 30px; font-size: 16px; }
+            .letter-char { font-size: 38px; }
+            .letter-candles-group { gap: 14px; bottom: 240px; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
@@ -901,14 +904,8 @@
 
             musicControl.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                if (AppState.music.playing) {
-                    audioManager.pause();
-                    AppState.music.playing = false;
-                } else {
-                    const success = await audioManager.play();
-                    AppState.music.playing = success;
-                    if (success && !AppState.music.started) AppState.music.started = true;
-                }
+                if (AppState.music.playing) { audioManager.pause(); AppState.music.playing = false; }
+                else { const success = await audioManager.play(); AppState.music.playing = success; if (success && !AppState.music.started) AppState.music.started = true; }
                 updateMusicUI();
             });
 
@@ -970,7 +967,7 @@
             characters.forEach((char, index) => { setTimeout(() => { char.classList.add('visible'); }, index * CONFIG.CHARACTER_DELAY_INTERVAL + CONFIG.CHARACTER_DELAY_BASE); });
 
             updateMusicUI();
-            console.log('🎵 祝福窗口打开时音乐将自动继续播放！');
+            console.log('🎉 已全面适配手机屏幕，所有元素清晰可见！');
         })();
     </script>
 </body>
