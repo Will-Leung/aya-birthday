@@ -157,6 +157,7 @@
         .cream-top::after { content: ''; position: absolute; top: 6px; left: 24px; right: 24px; height: 8px; background: rgba(255,255,255,0.75); border-radius: 50%; filter: blur(3px); }
         .sprinkle { position: absolute; width: 5px; height: 12px; border-radius: 3px; z-index: 8; opacity: 0.85; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 
+        /* 桌面端蜡烛位置 */
         .letter-candles-group { position: absolute; bottom: 276px; left: 50%; transform: translateX(-50%); display: flex; gap: 22px; z-index: 13; }
         .letter-item { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
         .letter-item:hover { transform: scale(1.06); }
@@ -392,6 +393,12 @@
             .top-right-sakura-char .char-icon img { height: 100px; }
             .cake-container { transform: scale(0.65); margin-top: -30px; }
             .main-title { font-size: 2rem; }
+            /* 蜡烛位置：增大了 bottom 值，使其上移，避免插入蛋糕 */
+            .letter-candles-group {
+                bottom: 280px;
+                gap: 18px;
+            }
+            .letter-char { font-size: 36px; }
             .blessing-modal { width: 95vw; max-width: 95vw; min-height: 0; height: auto; max-height: 85vh; border-radius: 16px; transform: scale(0.85); }
             .blessing-modal-overlay.active .blessing-modal { transform: scale(1); }
             .blessing-body { padding: 16px 12px; margin: 8px 10px; width: calc(100% - 20px); }
@@ -420,8 +427,6 @@
             .kero-chan { right: -30px; bottom: 5px; }
             .video-modal { width: 82vmin; height: 82vmin; }
             .video-close-btn { top: 0; right: 0; width: 30px; height: 30px; font-size: 16px; }
-            .letter-char { font-size: 38px; }
-            .letter-candles-group { gap: 14px; bottom: 240px; }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
@@ -446,8 +451,7 @@
             <div class="blessing-falling-container" id="blessingFallingContainer"></div>
             <div class="blessing-header">
                 <div class="blessing-title">
-                    <img class="spin-left" src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e0.webp" alt="装饰">
-                    魔法の祝福
+                    <img class="spin-left" src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e0.webp" alt="装饰"> 魔法の祝福
                     <img class="spin-right" src="https://pic1.imgdb.cn/item/69ee1bb1f12344047bf5d2e1.webp" alt="装饰">
                 </div>
             </div>
@@ -967,7 +971,7 @@
             characters.forEach((char, index) => { setTimeout(() => { char.classList.add('visible'); }, index * CONFIG.CHARACTER_DELAY_INTERVAL + CONFIG.CHARACTER_DELAY_BASE); });
 
             updateMusicUI();
-            console.log('🎉 已全面适配手机屏幕，所有元素清晰可见！');
+            console.log('🎂 蜡烛已从蛋糕中升起，手机端完美呈现！');
         })();
     </script>
 </body>
