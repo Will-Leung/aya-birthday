@@ -204,7 +204,7 @@
         .meiling-chan .char-icon img { height: 100px; }
         .syaoran-kun .char-icon img { height: 84px; }
         .yue .char-icon img { height: 120px; }
-        .sakura-wand-char { top: -30px; left: -180px; z-index: 18; }  /* 上移 */
+        .sakura-wand-char { top: -30px; left: -180px; z-index: 18; }
         .sakura-wand-char.visible { animation: wandFloatLarge 4s ease-in-out infinite; }
         .sakura-wand-char .char-icon img { height: 180px; transform: scaleX(-1); filter: drop-shadow(0 10px 16px rgba(180,100,120,0.35)); }
         .sakura-bottom-char { bottom: -95px; left: 50%; transform: translateX(-50%); z-index: 18; }
@@ -478,23 +478,23 @@
             .meiling-chan { left: -25px; bottom: 3px; }
             .syaoran-kun { right: -60px; bottom: 80px; }
             .yue { right: -50px; top: 5px; }
-            .sakura-wand-char { top: -35px; left: -100px; }  /* 移动端上移 */
+            .sakura-wand-char { top: -35px; left: -100px; }
             .sakura-bottom-char { bottom: -60px; }
             .spinel { top: 160px; left: -60px; }
             .kero-chan { right: -30px; bottom: 5px; }
             .video-modal { width: 82vmin; height: 82vmin; }
             .video-close-btn { top: 0; right: 0; width: 30px; height: 30px; font-size: 16px; }
 
-            /* ===== 移动端气泡修复 ===== */
+            /* ===== 移动端气泡：拉开距离，防止插入图片 ===== */
             .speech-bubble {
-                left: 70%;                    /* 向左稍微移动，防止溢出 */
+                left: 85%;                    /* 增大距离，远离绿衣小樱图片 */
                 font-size: 0.75rem;
                 padding: 10px 14px;
                 border-radius: 22px 22px 22px 6px;
-                white-space: normal;          /* 允许自动换行，但依靠 <br> 保持结构 */
-                word-break: keep-all;         /* 日文单词不断开 */
-                overflow-wrap: break-word;    /* 极端情况才断词 */
-                max-width: 160px;             /* 稍微增宽，确保文本容得下三行 */
+                white-space: normal;
+                word-break: keep-all;
+                overflow-wrap: break-word;
+                max-width: 150px;
                 transform: translateY(-50%) scale(0.9);
                 background: rgba(255, 245, 250, 0.75);
                 box-shadow: 0 6px 18px rgba(255,150,180,0.2),
