@@ -204,6 +204,7 @@
         .meiling-chan .char-icon img { height: 100px; }
         .syaoran-kun .char-icon img { height: 84px; }
         .yue .char-icon img { height: 120px; }
+        .yue-new .char-icon img { height: 120px; }
         .sakura-wand-char { top: -30px; left: -180px; z-index: 18; }
         .sakura-wand-char.visible { animation: wandFloatLarge 4s ease-in-out infinite; }
         .sakura-wand-char .char-icon img { height: 180px; transform: scaleX(-1); filter: drop-shadow(0 10px 16px rgba(180,100,120,0.35)); }
@@ -223,6 +224,9 @@
         .syaoran-kun.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -2s; }
         .yue { top: 8px; right: -75px; }
         .yue.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -0.5s; }
+        /* 新增的月位置：在雪兔下方，再下移20px */
+        .yue-new { top: 100px; right: -75px; }
+        .yue-new.visible { animation: charFloat 4s ease-in-out infinite; animation-delay: -0.8s; }
 
         .top-right-sakura-char {
             top: -245px; right: -170px; z-index: 19;
@@ -243,7 +247,7 @@
         @keyframes keroBounce { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-14px); } 50% { transform: translateY(0); } 70% { transform: translateY(-6px); } }
         @keyframes charFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 
-        /* ========== 可爱对话气泡（跟随角色出现） ========== */
+        /* ========== 可爱对话气泡 ========== */
         .speech-bubble {
             position: absolute;
             top: 50%;
@@ -272,7 +276,6 @@
             opacity: 1;
             transform: translateY(-50%) scale(1);
         }
-        /* 三角形箭头（指向角色） */
         .speech-bubble::before {
             content: '';
             position: absolute;
@@ -288,7 +291,6 @@
             border-radius: 0;
             box-shadow: none;
         }
-        /* 小星星装饰 */
         .speech-bubble::after {
             content: '✨';
             position: absolute;
@@ -473,6 +475,7 @@
             .meiling-chan .char-icon img { height: 65px; }
             .syaoran-kun .char-icon img { height: 55px; }
             .yue .char-icon img { height: 80px; }
+            .yue-new .char-icon img { height: 80px; }
             .sakura-wand-char .char-icon img { height: 110px; }
             .sakura-bottom-char .char-icon img { height: 70px; }
             .spinel .char-icon img { height: 55px; }
@@ -480,6 +483,7 @@
             .meiling-chan { left: -25px; bottom: 3px; }
             .syaoran-kun { right: -60px; bottom: 80px; }
             .yue { right: -50px; top: 5px; }
+            .yue-new { right: -50px; top: 90px; } /* 移动端也下移20px */
             .sakura-wand-char { top: -35px; left: -100px; }
             .sakura-bottom-char { bottom: -60px; }
             .spinel { top: 160px; left: -60px; }
@@ -487,7 +491,6 @@
             .video-modal { width: 82vmin; height: 82vmin; }
             .video-close-btn { top: 0; right: 0; width: 30px; height: 30px; font-size: 16px; }
 
-            /* 移动端气泡：跟随出现 + 拉开距离 */
             .speech-bubble {
                 left: 85%;
                 font-size: 0.75rem;
@@ -497,7 +500,7 @@
                 word-break: keep-all;
                 overflow-wrap: break-word;
                 max-width: 150px;
-                transform: translateY(-50%) scale(0.8);  /* 初始缩小 */
+                transform: translateY(-50%) scale(0.8);
                 background: rgba(255, 245, 250, 0.75);
                 box-shadow: 0 6px 18px rgba(255,150,180,0.2),
                             0 0 0 2px rgba(255,180,200,0.4),
@@ -516,7 +519,7 @@
                 font-size: 1.3rem;
             }
             .character.visible .speech-bubble {
-                transform: translateY(-50%) scale(0.9);  /* 手机上稍微小一点 */
+                transform: translateY(-50%) scale(0.9);
             }
         }
     </style>
@@ -615,7 +618,9 @@
             <div class="character tomo-chan"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee7e7df12344047bf722bc.png" alt="知世"></span></div>
             <div class="character meiling-chan"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee7d96f12344047bf71e2b.png" alt="李梅玲"></span></div>
             <div class="character syaoran-kun"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee119ef12344047bf59a8a.webp" alt="小狼"></span></div>
-            <div class="character yue"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee11a4f12344047bf59a92.webp" alt="月"></span></div>
+            <div class="character yue"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/69ee11a4f12344047bf59a92.webp" alt="雪兔"></span></div>
+            <!-- 新增的月角色，位于雪兔下方，已下移20px -->
+            <div class="character yue-new"><span class="char-icon"><img src="https://pic1.imgdb.cn/item/6a01b38b514fff0f73777736.webp" alt="月"></span></div>
         </div>
     </div>
 
@@ -1067,7 +1072,7 @@
             characters.forEach((char, index) => { setTimeout(() => { char.classList.add('visible'); }, index * CONFIG.CHARACTER_DELAY_INTERVAL + CONFIG.CHARACTER_DELAY_BASE); });
 
             updateMusicUI();
-            console.log('🎂 蜡烛已从蛋糕中升起，手机端完美呈现！');
+            console.log('🎂 生日快乐！雪兔和月都来啦~');
         })();
     </script>
 </body>
